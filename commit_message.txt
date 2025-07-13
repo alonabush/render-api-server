@@ -1,1 +1,1 @@
-Initial commit: Basic Node.js API server for Render.com
+Feature: Add Mojang UUID lookup for /name route
