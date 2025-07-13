@@ -1,1 +1,1 @@
-Feature: Add Mojang UUID lookup for /name route
+Feature: Integrate Hypixel API data for /name route

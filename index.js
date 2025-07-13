@@ -35,10 +35,25 @@ app.get('/name/:username', async (req, res) => {
     }
     const hypixelData = await hypixelResponse.json();
 
+    let inventoryContents = null;
+
+    // Find the active SkyBlock profile and extract inventory data
+    if (hypixelData.profiles && Object.keys(hypixelData.profiles).length > 0) {
+      const profileId = Object.keys(hypixelData.profiles)[0]; // Taking the first profile for simplicity
+      const memberData = hypixelData.profiles[profileId].members[uuid];
+
+      if (memberData && memberData.inventory && memberData.inventory.inv_contents && memberData.inventory.inv_contents.data) {
+        const base64Data = memberData.inventory.inv_contents.data;
+        // The data is typically gzipped NBT data, so simply decoding Base64 won't make it human-readable JSON.
+        // It would require a library like 'nbt' to decompress and parse.
+        inventoryContents = Buffer.from(base64Data, 'base64').toString('utf8');
+      }
+    }
+
     res.json({
       name: mojangData.name,
       uuid: mojangData.id,
-      hypixelApi: hypixelData
+      inventory: inventoryContents
     });
 
   } catch (error) {
