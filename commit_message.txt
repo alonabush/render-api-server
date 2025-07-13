@@ -1,1 +1,1 @@
-Feature: Integrate Hypixel API data for /name route
+Feature: Extract and decode inventory data from Hypixel API

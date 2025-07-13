@@ -1,5 +1,7 @@
 const express = require('express');
 const fetch = require('node-fetch');
+const nbt = require('prismarine-nbt');
+const zlib = require('zlib');
 const app = express();
 const port = process.env.PORT || 3000;
 const HYPIXEL_API_KEY = process.env.API_KEY;
@@ -44,9 +46,16 @@ app.get('/name/:username', async (req, res) => {
 
       if (memberData && memberData.inventory && memberData.inventory.inv_contents && memberData.inventory.inv_contents.data) {
         const base64Data = memberData.inventory.inv_contents.data;
-        // The data is typically gzipped NBT data, so simply decoding Base64 won't make it human-readable JSON.
-        // It would require a library like 'nbt' to decompress and parse.
-        inventoryContents = Buffer.from(base64Data, 'base64').toString('utf8');
+        const buffer = Buffer.from(base64Data, 'base64');
+
+        try {
+          // Hypixel NBT data is usually gzipped
+          const result = await nbt.parse(buffer);
+          inventoryContents = result.parsed;
+        } catch (nbtError) {
+          console.error('Error parsing NBT data:', nbtError);
+          inventoryContents = 'Error parsing inventory data';
+        }
       }
     }
 
